@@ -97,12 +97,37 @@ class MyTest {
 			assertEquals(2,s1.coordinatesR[i]);
 			assertEquals(i+3, s1.coordinatesC[i]);
 		}
+		//Test collision
 		Ship s2 = new Ship(4);
-
-
-
-
-
+		b.placeShip(s2, 2, 0, 2, 3);
+		assertNull(b.board[2][0]);
+		assertNull(b.board[2][2]);
+		assertEquals(s1, b.board[2][3]);
+		b.placeShip(s2, 0, 4, 3, 4);
+		assertNull(b.board[0][4]);
+		assertNull(b.board[1][4]);
+		assertNull(b.board[3][4]);
+		assertEquals(s1, b.board[2][4]);
+		b.placeShip(s2, 2, 9, 2, 6);
+		assertNull(b.board[2][9]);
+		assertNull(b.board[2][8]);
+		assertEquals(s1, b.board[2][7]);
+		assertEquals(s1, b.board[2][6]);
+		b.placeShip(s2, 5, 5, 2, 5);
+		assertNull(b.board[5][5]);
+		assertNull(b.board[4][5]);
+		assertNull(b.board[3][5]);
+		assertEquals(s1, b.board[2][5]);
+		b.placeShip(s2, 8, 1, 5, 1);
+		assertEquals(s2, b.board[5][1]);
+		assertEquals(s2, b.board[6][1]);
+		assertEquals(s2, b.board[7][1]);
+		assertEquals(s2, b.board[8][1]);
+		assertNull(b.board[9][1]);
+		for (int i = 0; i < s2.size; i++) {
+			assertEquals(i + 5, s2.coordinatesR[i]);
+			assertEquals(1, s2.coordinatesC[i]);
+		}
 		b.printBoard();
 	}
 
