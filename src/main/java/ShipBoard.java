@@ -4,9 +4,23 @@ public class ShipBoard {
 
     Ship[][] board;
 
+    Ship[] ships;
+    int shipsLeft;
 
     ShipBoard() {
         board = new Ship[10][10];
+        ships = new Ship[5];
+        Ship s1 = new Ship(2);
+        Ship s2 = new Ship(3);
+        Ship s3 = new Ship(3);
+        Ship s4 = new Ship(4);
+        Ship s5 = new Ship(5);
+        ships[0] = s1;
+        ships[1] = s2;
+        ships[2] = s3;
+        ships[3] = s4;
+        ships[4] = s5;
+        shipsLeft = 5;
     }
 
     //those will be from 0 to 9 but where we call it we will modify aruemts
