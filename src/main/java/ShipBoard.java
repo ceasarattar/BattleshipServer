@@ -150,6 +150,7 @@ public class ShipBoard {
                 if (s.hitpoints == 0) {
                     System.out.println("You destryed the ship");
                     s.isDestroyed = true;
+                    shipsLeft--;
                     return 2;
                 }
                 else {
