@@ -128,7 +128,125 @@ class MyTest {
 			assertEquals(i + 5, s2.coordinatesR[i]);
 			assertEquals(1, s2.coordinatesC[i]);
 		}
-		b.printBoard();
+	}
+
+	@Test
+	public void testHitShipAndBoardInteraction() {
+		ShipBoard b = new ShipBoard();
+		b.placeShip(b.ships[0],1, 7, 1, 8);
+		b.placeShip(b.ships[1], 0, 6, 2, 6);
+		b.placeShip(b.ships[2], 4, 0, 4, 2);
+		b.placeShip(b.ships[3], 6, 2, 9, 2);
+		b.placeShip(b.ships[4], 8, 3, 8, 7);
+		//missed hits
+		assertEquals(0, b.hitShip(0, 1));
+		assertEquals(0, b.hitShip(2, 5));
+		assertEquals(0, b.hitShip(9, 6));
+		assertEquals(0, b.hitShip(6, 7));
+		assertEquals(0, b.hitShip(5, 0));
+		assertEquals(0, b.hitShip(3, 3));
+		assertEquals(0, b.hitShip(7, 0));
+		assertEquals(0, b.hitShip(2, 9));
+		//first hit
+		assertEquals(1, b.hitShip(1, 6));
+		assertTrue(b.ships[1].hit[1]);
+		assertFalse(b.ships[1].hit[0]);
+		assertFalse(b.ships[1].hit[2]);
+		assertEquals(2, b.ships[1].hitpoints);
+		assertEquals(5, b.shipsLeft);
+		//repeat hit
+		assertEquals(3, b.hitShip(1, 6));
+		assertTrue(b.ships[1].hit[1]);
+		assertFalse(b.ships[1].hit[0]);
+		assertFalse(b.ships[1].hit[2]);
+		assertEquals(2, b.ships[1].hitpoints);
+		assertEquals(5, b.shipsLeft);
+		//second hit
+		assertEquals(1, b.hitShip(2, 6));
+		assertTrue(b.ships[1].hit[1]);
+		assertFalse(b.ships[1].hit[0]);
+		assertTrue(b.ships[1].hit[2]);
+		assertEquals(1, b.ships[1].hitpoints);
+		assertEquals(5, b.shipsLeft);
+		//second repeat hit
+		assertEquals(3, b.hitShip(2, 6));
+		assertTrue(b.ships[1].hit[1]);
+		assertFalse(b.ships[1].hit[0]);
+		assertTrue(b.ships[1].hit[2]);
+		assertEquals(1, b.ships[1].hitpoints);
+		assertEquals(5, b.shipsLeft);
+		//third hit
+		assertEquals(2, b.hitShip(0, 6));
+		assertTrue(b.ships[1].hit[1]);
+		assertTrue(b.ships[1].hit[0]);
+		assertTrue(b.ships[1].hit[2]);
+		assertEquals(0, b.ships[1].hitpoints);
+		assertEquals(4, b.shipsLeft);
+		assertEquals(3, b.hitShip(0, 6));
+		assertTrue(b.ships[1].hit[1]);
+		assertTrue(b.ships[1].hit[0]);
+		assertTrue(b.ships[1].hit[2]);
+		assertEquals(0, b.ships[1].hitpoints);
+		assertEquals(4, b.shipsLeft);
+		//another ship
+		//hit one
+		assertEquals(1, b.hitShip(1, 7));
+		assertTrue(b.ships[0].hit[0]);
+		assertFalse(b.ships[0].hit[1]);
+		assertEquals(1, b.ships[0].hitpoints);
+		assertEquals(4, b.shipsLeft);
+		//hit two
+		assertEquals(2, b.hitShip(1, 8));
+		assertTrue(b.ships[0].hit[0]);
+		assertTrue(b.ships[0].hit[1]);
+		assertEquals(0, b.ships[0].hitpoints);
+		assertEquals(3, b.shipsLeft);
+		//repeated hits
+		assertEquals(3, b.hitShip(1, 7));
+		assertTrue(b.ships[0].hit[0]);
+		assertTrue(b.ships[0].hit[1]);
+		assertEquals(0, b.ships[0].hitpoints);
+		assertEquals(3, b.shipsLeft);
+		assertEquals(3, b.hitShip(1, 8));
+		assertTrue(b.ships[0].hit[0]);
+		assertTrue(b.ships[0].hit[1]);
+		assertEquals(0, b.ships[0].hitpoints);
+		assertEquals(3, b.shipsLeft);
+		//third ship
+		//hit one
+		assertEquals(1, b.hitShip(4, 0));
+		assertTrue(b.ships[2].hit[0]);
+		assertFalse(b.ships[2].hit[1]);
+		assertFalse(b.ships[2].hit[2]);
+		assertEquals(2, b.ships[2].hitpoints);
+		assertEquals(3, b.shipsLeft);
+		//hit two
+		assertEquals(1, b.hitShip(4, 1));
+		assertTrue(b.ships[2].hit[0]);
+		assertTrue(b.ships[2].hit[1]);
+		assertFalse(b.ships[2].hit[2]);
+		assertEquals(1, b.ships[2].hitpoints);
+		assertEquals(3, b.shipsLeft);
+		//hit three
+		assertEquals(2, b.hitShip(4, 2));
+		assertTrue(b.ships[2].hit[0]);
+		assertTrue(b.ships[2].hit[1]);
+		assertTrue(b.ships[2].hit[2]);
+		assertEquals(0, b.ships[2].hitpoints);
+		assertEquals(2, b.shipsLeft);
+		//ship 4 and 5 at the same time
+		assertEquals(1, b.hitShip(8, 2));
+		assertEquals(1, b.hitShip(7, 2));
+		assertEquals(1, b.hitShip(8, 3));
+		assertEquals(1, b.hitShip(8, 7));
+		assertEquals(1, b.hitShip(8, 6));
+		assertEquals(1, b.hitShip(8, 5));
+		assertEquals(1, b.hitShip(9, 2));
+		assertEquals(2, b.shipsLeft);
+		assertEquals(2, b.hitShip(8, 4));
+		assertEquals(1, b.shipsLeft);
+		assertEquals(2, b.hitShip(6, 2));
+		assertEquals(0, b.shipsLeft);
 	}
 
 }
