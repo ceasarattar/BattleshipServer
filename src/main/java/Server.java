@@ -19,6 +19,11 @@ public class Server{
 	ArrayList<ClientThread> clients = new ArrayList<ClientThread>();
 	TheServer server;
 	private Consumer<Serializable> callback;
+
+	ArrayList<ClientThread> waitingForGame = new ArrayList<>();
+
+
+
 	
 	
 	Server(Consumer<Serializable> call){
@@ -62,6 +67,8 @@ public class Server{
 			int count;
 			ObjectInputStream in;
 			ObjectOutputStream out;
+
+			ClientThread opponent;
 			
 			ClientThread(Socket s, int count){
 				this.connection = s;
@@ -93,10 +100,25 @@ public class Server{
 					
 				 while(true) {
 					    try {
-					    	String data = in.readObject().toString();
+					    	GameInfo data = (GameInfo)in.readObject();
 					    	callback.accept("client: " + count + " sent: " + data);
-					    	updateClients("client #"+count+" said: "+data);
-					    	
+
+							if (data.lookingForGame) {
+								waitingForGame.add(this);
+								if (waitingForGame.size() == 2) {
+									waitingForGame.get(0).opponent = waitingForGame.get(1);
+									waitingForGame.get(1).opponent = waitingForGame.get(0);
+									GameInfo newGame = new GameInfo();
+									newGame.gameFound = true;
+									waitingForGame.get(0).out.writeObject(newGame);
+									waitingForGame.get(1).out.writeObject(newGame);
+									waitingForGame.clear();
+								}
+							}
+
+//							updateClients("client #"+count+" said: "+data);
+
+
 					    	}
 					    catch(Exception e) {
 					    	callback.accept("OOOOPPs...Something wrong with the socket from client: " + count + "....closing down!");
