@@ -20,7 +20,14 @@ public class Server{
 	TheServer server;
 	private Consumer<Serializable> callback;
 
-	ArrayList<ClientThread> waitingForGame = new ArrayList<>();
+	ArrayList<ClientThread> waitingForGame = new ArrayList<>();  //users that want to play online game
+	//will be added here once there is 2 a new game is created for them. This takes place in ClientThread
+	//on the server side once the thread receives GameInfo
+	ArrayList<BattleShipsGame> currentGames = new ArrayList<>();
+	//This will be list of current games being played out
+	int battleShipGameIndex = 0;
+	//Used to track the games. Each client thread has a game index so that server knows which game they
+	//are playing
 
 
 
@@ -69,6 +76,9 @@ public class Server{
 			ObjectOutputStream out;
 
 			ClientThread opponent;
+			int gameIndex;
+			int playerNumber;
+
 			
 			ClientThread(Socket s, int count){
 				this.connection = s;
@@ -110,11 +120,50 @@ public class Server{
 									waitingForGame.get(1).opponent = waitingForGame.get(0);
 									GameInfo newGame = new GameInfo();
 									newGame.gameFound = true;
+									BattleShipsGame game = new BattleShipsGame();
+									currentGames.add(game);
+									System.out.println("New game started index: " + battleShipGameIndex +
+											" between user number: " + waitingForGame.get(0).count +
+											" and player number: " + waitingForGame.get(1).count);
+									waitingForGame.get(0).gameIndex = battleShipGameIndex;
+									waitingForGame.get(1).gameIndex = battleShipGameIndex;
+									battleShipGameIndex++;
+									waitingForGame.get(0).playerNumber = 1;
+									waitingForGame.get(1).playerNumber = 2;
 									waitingForGame.get(0).out.writeObject(newGame);
 									waitingForGame.get(1).out.writeObject(newGame);
 									waitingForGame.clear();
 								}
 							}
+							//Not finished at all
+							else if (data.placeShip) {
+								if (playerNumber == 1) {
+									ShipBoard temp = currentGames.get(gameIndex).player1Board;
+									int val = temp.placeShip(temp.ships[temp.currentShip], 1, 1, 1, 1);
+									if (val == 1) {
+										temp.currentShip++;
+									}
+								}
+								else if (playerNumber == 2){
+									ShipBoard temp = currentGames.get(gameIndex).player2Board;
+									int val = temp.placeShip(temp.ships[temp.currentShip], 1, 1, 1, 1);
+									if (val == 1) {
+										temp.currentShip++;
+									}
+								}
+							}
+
+							//next step
+							//if its not want to game then its during game
+							//go back to menu will be made later
+							//first place ship
+							//we will get sets of cords from user here
+							//get index from thread to get game and het player index
+							//then check then call place ship in given cords for correct board
+							//await return
+							//message user with reuslt
+							//repeat untill all ships are placed
+
 
 //							updateClients("client #"+count+" said: "+data);
 

@@ -6,7 +6,7 @@ public class ShipBoard {
 
     Ship[] ships;
     int shipsLeft;
-
+    int currentShip = 0;
     ShipBoard() {
         board = new Ship[10][10];
         ships = new Ship[5];
@@ -24,19 +24,21 @@ public class ShipBoard {
     }
 
     //those will be from 0 to 9 but where we call it we will modify aruemts
-    void placeShip(Ship s, int r1, int c1, int r2, int c2) {
+    //return 0 if invalid
+    //return 1 if valid
+    int placeShip(Ship s, int r1, int c1, int r2, int c2) {
 
         if (r1 > 9 || r1 < 0 || r2 > 9 || r2 < 0 || c1 > 9 || c1 < 0 || c2 > 9 || c2 < 0) {
             System.out.println("Cords out of bounds");
-            return;
+            return 0;
         }
         else if (r1 == r2 && c1 == c2) {     //both x and y coordinates are the same so ship is a point
             System.out.println("Invalid cords");
-            return;
+            return 0;
         }
         else if  (r1 != r2 && c1 != c2) {   //if both x's and y's are different then ship is diagonal
             System.out.println("Invalid cords");
-            return;
+            return 0;
         }
         // check if the coordinates match the ship size
         int rowDiff = Math.abs(r2 - r1);
@@ -59,11 +61,11 @@ public class ShipBoard {
         //check if coords match length
         if (horizontal && colDiff + 1 != s.size) {
             System.out.println("Wrong cords for a ship with given size");
-            return;
+            return 0;
         }
         else if (!horizontal && rowDiff + 1 != s.size) {
             System.out.println("Wrong cords for a ship with given size");
-            return;
+            return 0;
         }
 
         //test that later
@@ -77,7 +79,7 @@ public class ShipBoard {
             for (int i = Math.min(c1, c2); i <= Math.max(c1, c2); i++) {
                 if (board[r1][i] != null) {
                     System.out.println("Something exists there arleadt");
-                    return;
+                    return 0;
                 }
             }
             //coordinates will be in the form A1   B4  C10
@@ -99,7 +101,7 @@ public class ShipBoard {
             for (int i = Math.min(r1, r2); i <= Math.max(r1, r2); i++) {
                 if (board[i][c1] != null) {
                     System.out.println("Something already exists there");
-                    return;
+                    return 0;
                 }
             }
             int shipArrayIndex = 0; //same as above
@@ -110,7 +112,7 @@ public class ShipBoard {
                 shipArrayIndex++;
             }
         }
-
+        return 1;
     }
 
 
