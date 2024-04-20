@@ -137,20 +137,38 @@ public class Server{
 							}
 							//Not finished at all
 							else if (data.placeShip) {
+								ShipBoard temp;
 								if (playerNumber == 1) {
-									ShipBoard temp = currentGames.get(gameIndex).player1Board;
-									int val = temp.placeShip(temp.ships[temp.currentShip], 1, 1, 1, 1);
-									if (val == 1) {
-										temp.currentShip++;
+									temp = currentGames.get(gameIndex).player1Board;
+								}
+								else {
+									temp = currentGames.get(gameIndex).player2Board;
+								}
+								int r1 = data.r1;
+								int c1 = data.c1;
+								int r2 = data.r2;
+								int c2 = data.c2;
+								int val = temp.placeShip(temp.ships[temp.currentShip], r1, c1, r2, c2);
+								GameInfo placementMessage = new GameInfo();
+								placementMessage.placeShip = true;
+								if (val == 1) {
+									temp.currentShip++;
+									placementMessage.validPlacement = true;
+									placementMessage.r1 = r1;
+									placementMessage.c1 = c1;
+									placementMessage.r2 = r2;
+									placementMessage.c2 = c2;
+									if (temp.currentShip == 5) {
+										placementMessage.allShipsPlaced = true;
+										System.out.println("All ships placed");
 									}
 								}
-								else if (playerNumber == 2){
-									ShipBoard temp = currentGames.get(gameIndex).player2Board;
-									int val = temp.placeShip(temp.ships[temp.currentShip], 1, 1, 1, 1);
-									if (val == 1) {
-										temp.currentShip++;
-									}
-								}
+								out.writeObject(placementMessage);
+								System.out.println("Ship placement for game index " + gameIndex);
+								System.out.println("P1 board");
+								currentGames.get(gameIndex).player1Board.printBoard();
+								System.out.println("P2 board");
+								currentGames.get(gameIndex).player2Board.printBoard();
 							}
 
 							//next step

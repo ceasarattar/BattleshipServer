@@ -5,4 +5,10 @@ public class GameInfo implements Serializable {
     boolean lookingForGame = false;
     boolean gameFound = false;
     boolean placeShip = false;
+    int r1;
+    int c1;
+    int r2;
+    int c2;
+    boolean validPlacement = false;
+    boolean allShipsPlaced = false;
 }
