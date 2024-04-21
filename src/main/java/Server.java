@@ -114,82 +114,127 @@ public class Server{
 					    	callback.accept("client: " + count + " sent: " + data);
 
 							if (data.lookingForGame) {
-								waitingForGame.add(this);
+								waitingForGame.add(this); //add clientthread to arraylist
+								//if there is 2 thread there, clear the list and match them together
 								if (waitingForGame.size() == 2) {
+									//each client thread has the oponets thread for easier communication
 									waitingForGame.get(0).opponent = waitingForGame.get(1);
 									waitingForGame.get(1).opponent = waitingForGame.get(0);
 									GameInfo newGame = new GameInfo();
 									newGame.gameFound = true;
 									BattleShipsGame game = new BattleShipsGame();
 									currentGames.add(game);
+									//new game was created and added to list of games
 									System.out.println("New game started index: " + battleShipGameIndex +
 											" between user number: " + waitingForGame.get(0).count +
 											" and player number: " + waitingForGame.get(1).count);
+									//give each waiting player the index of the current game
 									waitingForGame.get(0).gameIndex = battleShipGameIndex;
 									waitingForGame.get(1).gameIndex = battleShipGameIndex;
 									battleShipGameIndex++;
+									//give them palyer numbers
 									waitingForGame.get(0).playerNumber = 1;
 									waitingForGame.get(1).playerNumber = 2;
+									//send to them that game was found and clear the list
 									waitingForGame.get(0).out.writeObject(newGame);
 									waitingForGame.get(1).out.writeObject(newGame);
 									waitingForGame.clear();
 								}
 							}
-							//Not finished at all
+							//ships is being placed
 							else if (data.placeShip) {
 								ShipBoard temp;
+								BattleShipsGame game = currentGames.get(gameIndex);
+								//get the board from given player
 								if (playerNumber == 1) {
-									temp = currentGames.get(gameIndex).player1Board;
+									temp = game.player1Board;
 								}
 								else {
-									temp = currentGames.get(gameIndex).player2Board;
+									temp = game.player2Board;
 								}
 								int r1 = data.r1;
 								int c1 = data.c1;
 								int r2 = data.r2;
 								int c2 = data.c2;
+								//try to place ship at given location
 								int val = temp.placeShip(temp.ships[temp.currentShip], r1, c1, r2, c2);
 								GameInfo placementMessage = new GameInfo();
 								placementMessage.placeShip = true;
 								if (val == 1) {
 									temp.currentShip++;
 									placementMessage.validPlacement = true;
+									//cords for the gui
 									placementMessage.r1 = r1;
 									placementMessage.c1 = c1;
 									placementMessage.r2 = r2;
 									placementMessage.c2 = c2;
+									//if all ships are placed add the flag to disable the placement gui
 									if (temp.currentShip == 5) {
 										placementMessage.allShipsPlaced = true;
 										System.out.println("All ships placed");
 									}
 								}
+								//send the message
+								//if placement was invalid then valid placement is false by default
 								out.writeObject(placementMessage);
+								//server/debugging purposes
 								System.out.println("Ship placement for game index " + gameIndex);
 								System.out.println("P1 board");
-								currentGames.get(gameIndex).player1Board.printBoard();
+								game.player1Board.printBoard();
 								System.out.println("P2 board");
-								currentGames.get(gameIndex).player2Board.printBoard();
+								game.player2Board.printBoard();
+
+								//if both players placed all ships start the game
+								if (game.player1Board.currentShip == 5 && game.player2Board.currentShip == 5) {
+									System.out.println("All ships placed for both players in game " + gameIndex);
+									GameInfo startGame = new GameInfo();
+									startGame.allShipsPlacedBothPlayers = true;
+									out.writeObject(startGame);
+									startGame.yourTurn = true; //whoever placed first, its their turn
+									opponent.out.writeObject(startGame);
+								}
+
+
+							}
+							else if (data.hitShip) {
+								int hitRow = data.hitShipRow;
+								int hitCol = data.hitShipCol;
+								int result;
+								int shipsLeft;
+								//a message that ship was hit
+								BattleShipsGame game = currentGames.get(gameIndex);
+								//check from who was the message and hit the ship on enemy's board
+								if (playerNumber == 1) {
+									result = game.player2Board.hitShip(hitRow, hitCol);
+									shipsLeft = game.player2Board.shipsLeft;
+								}
+								else {
+									result = game.player1Board.hitShip(hitRow, hitCol);
+									shipsLeft = game.player1Board.shipsLeft;
+								}
+								//the one who shot needs to know the cords they shot, result, how many ships opponent has left
+								GameInfo hitResult = new GameInfo();
+								hitResult.shipHitResult = result;
+								hitResult.shipsLeftAfterHit = shipsLeft;
+								hitResult.hitShipRow = hitRow;
+								hitResult.hitShipCol = hitCol;
+								hitResult.youHitShip = true;
+								out.writeObject(hitResult);
+								//the one who got hit needs to know which ship, cords, and how many ships they have left
+								//why, for the auto lose and win screen
+								GameInfo oponentHitResult = new GameInfo();
+								oponentHitResult.yourShipWasHit = true;
+								oponentHitResult.hitShipRow = hitRow;
+								oponentHitResult.hitShipCol = hitCol;
+								oponentHitResult.shipHitResult = result;
+								oponentHitResult.shipsLeftAfterHit = shipsLeft;
+								opponent.out.writeObject(oponentHitResult);
+
 							}
 
-							//next step
-							//if its not want to game then its during game
-							//go back to menu will be made later
-							//first place ship
-							//we will get sets of cords from user here
-							//get index from thread to get game and het player index
-							//then check then call place ship in given cords for correct board
-							//await return
-							//message user with reuslt
-							//repeat untill all ships are placed
-
-
-//							updateClients("client #"+count+" said: "+data);
-
-
-					    	}
+						}
 					    catch(Exception e) {
 					    	callback.accept("OOOOPPs...Something wrong with the socket from client: " + count + "....closing down!");
-					    	updateClients("Client #"+count+" has left the server!");
 					    	clients.remove(this);
 					    	break;
 					    }

@@ -11,4 +11,14 @@ public class GameInfo implements Serializable {
     int c2;
     boolean validPlacement = false;
     boolean allShipsPlaced = false;
+    boolean allShipsPlacedBothPlayers = false;
+    boolean yourTurn = false;
+    boolean hitShip = false;
+    int hitShipRow;
+    int hitShipCol;
+    int shipsLeftAfterHit;
+    int shipHitResult;
+    boolean youHitShip = false;
+    boolean yourShipWasHit = false;
+
 }
