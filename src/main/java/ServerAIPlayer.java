@@ -1,8 +1,11 @@
 import java.util.Random;
 
 public class ServerAIPlayer {
-    private ShipBoard aiBoard;
+    public ShipBoard aiBoard;
+    public ShipBoard enemyBoard;
     private Random rand = new Random();
+
+    private int[][] guesses = new int[10][10];
 
     public ServerAIPlayer() {
         this.aiBoard = new ShipBoard();
@@ -52,19 +55,15 @@ public class ServerAIPlayer {
         GameInfo aiMove = new GameInfo();
         int row, col;
         do {
-            row = rand.nextInt(aiBoard.board.length);
-            col = rand.nextInt(aiBoard.board[0].length);
-        } while (aiBoard.board[row][col] != null && aiBoard.board[row][col].isDestroyed()); // Check if the tile is already destroyed
-
+            row = rand.nextInt(enemyBoard.board.length);
+            col = rand.nextInt(enemyBoard.board[0].length);
+        } while (guesses[row][col] == 1); // Check if the tile is already destroyed
+        guesses[row][col] = 1;
         // Determine the effect of the move
-        if (aiBoard.board[row][col] != null) {
             aiMove.hitShip = true;
             aiMove.hitShipRow = row;
             aiMove.hitShipCol = col;
             // Further handling to check if the ship is destroyed etc.
-        } else {
-            aiMove.hitShip = false;
-        }
         return aiMove;
     }
 }

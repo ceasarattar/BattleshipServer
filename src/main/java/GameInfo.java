@@ -21,4 +21,7 @@ public class GameInfo implements Serializable {
     boolean youHitShip = false;
     boolean yourShipWasHit = false;
 
+    boolean lookingForOfflineGame = false;
+    boolean aiGame = false;
+
 }
