@@ -24,4 +24,8 @@ public class Ship {
                     " Hit: " + hit[i]);
         }
     }
+
+    public boolean isDestroyed() {
+        return hitpoints == 0;
+    }
 }
